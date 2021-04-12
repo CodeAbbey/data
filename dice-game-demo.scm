@@ -1,0 +1,35 @@
+(define (dice-throw)
+    (+ 1 (modulo (random-next) 6)))
+
+(define player-states #((list #f) (list #f)))
+
+(define (player-dummy2 sum-my sum-his acc cur st)
+    (display "his: ")
+    (display cur)
+    (newline)
+    (zero? acc))
+
+(define (player-manual sum-my sum-his acc cur st)
+    (for-each display (list "my=" sum-my ", his=" sum-his ", acc=" acc ", cur=" cur))
+    (newline)
+    (display "throw again? (#t or #f): ")
+    (read))
+
+(define (rep-throw pl my his st)
+    (let loop ((acc 0))
+        (let* ((nxt (dice-throw)) (tot (+ acc nxt)) (ur (pl my his acc nxt st)))
+            (if (or (= nxt 1) (not ur))
+                (if (= nxt 1) 0 tot)
+                (loop tot)))))
+
+(define (game player1 player2)
+    (let loop ((p1 player1) (p2 player2) (s1 0) (s2 0) (side 0))
+        (let* ((ur (rep-throw p1 s1 s2 (vector-ref player-states side)))
+                (s1a (+ s1 ur)))
+            (if (>= s1a 100)
+                (begin (display "Winner is #")
+                    (display side)
+                    (newline))
+                (loop p2 p1 s2 s1a (- 1 side))))))
+
+(game player-dummy2 player-manual)
